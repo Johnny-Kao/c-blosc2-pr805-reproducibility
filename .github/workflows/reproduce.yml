@@ -1,0 +1,25 @@
+name: Reproduce PR #805
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  reproduce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install plotting dependency
+        run: python3 -m pip install --break-system-packages matplotlib
+      - name: Run original paired matrix on pinned C-Blosc2 commits
+        run: bash scripts/run.sh
+      - name: Upload reproducibility outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr805-reproduction-results
+          path: results/
+          if-no-files-found: warn
+          retention-days: 7
